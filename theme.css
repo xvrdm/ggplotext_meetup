@@ -1,0 +1,37 @@
+.middle:not(.inverse) > h1 {
+  color:#1A292C;
+}
+
+.remark-slide-content:not(.inverse) {
+  background-color: #F5FFFA;
+}
+
+.remark-code { 
+  font-size: 14px;
+}
+
+.title-slide-custom .remark-slide-number {
+  display: none;
+}
+
+h4 {
+  font-family: "Rubik", "Helvetica Neue", "Arial";
+}
+
+pre {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/*
+.remark-slide-content {
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+*/
+
+.remark-slide-number {
+  display: none;
+}
