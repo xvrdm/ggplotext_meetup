@@ -24,7 +24,7 @@ class: middle, centered
 
 # Three more 🥄🥄🥄 of ggplot2
 ### Post Processing, extensions and internals
-<br />
+<br /> 
 <br />
 
 #### Geneve R User Meetup &mdash; April 26th 2018
@@ -153,9 +153,7 @@ chart %>% image_border("lightgrey", "0x6")
 
 ---
 
-Make a more complex margin: 50px + 6px + 170px. Then crop the bottom margin.
-
-I haven't found a way yet to not create the bottom margin, the `magick::image_border()` seems to only work symetrically
+Make a more complex margin: 50px + 6px + 170px. Then crop the bottom margin. I haven't found a way yet to not create the bottom margin, the `magick::image_border()` seems to only work symetrically
 
 ```{r message=FALSE, warning=FALSE}
 (chart_w_margins <- chart %>% 
