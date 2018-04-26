@@ -340,7 +340,7 @@ As well as on a complete grammar of animation for ggplot2!
 
 <img src="thomas.gif" width="22%">
 
-<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">More grammar arrives:<br><br>ggplot(mtcars, aes(factor(cyl), mpg)) + <br> geom_boxplot() + <br> geom_point() +<br> transition_states(am, transition_length = 4, state_length = 1) + <br> view_follow() </p>&mdash; Thomas Lin Pedersen (@thomasp85) <a href="https://twitter.com/thomasp85/status/988863035388366851?ref_src=twsrc%5Etfw">April 24, 2018</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script> 
+<blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">More grammar arrives:<br><br>ggplot(mtcars, aes(factor(cyl), mpg)) + <br> geom_boxplot() + <br> geom_point() +<br> transition_states(am, transition_length = 4, state_length = 1) + <br> view_follow() </p>&mdash; Thomas Lin Pedersen (@thomasp85) <a href="https://twitter.com/thomasp85/status/988863035388366851?ref_src=twsrc%5Etfw">April 24, 2018</a></blockquote>  
 
 ---
 
