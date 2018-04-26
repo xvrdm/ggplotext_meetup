@@ -8,13 +8,11 @@ output:
     lib_dir: libs
     css: [default, default-fonts, "theme.css"]
     seal: false
-    self_contained: true
     chakra: libs/remark-latest.min.js
     nature:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
-      beforeInit: "https://platform.twitter.com/widgets.js"
 ---
 
 ```{r setup, include=FALSE}
@@ -31,7 +29,7 @@ class: middle, centered
 
 #### Geneve R User Meetup &mdash; April 26th 2018
 #### Xavier Adam (twitter: [@xvrdm](http://twitter.com/xvrdm/))
-<img src="epfl-exts-logo.png" width="30%">  
+<img src="./epfl-exts-logo.png" width="30%">  
 
 ---
 class: middle
@@ -260,7 +258,7 @@ data %>%
 gganimate(chart, "chart.gif", ani.width=800, ani.height=350) #<<
 ```
 
-![](chart.gif)
+![](./chart.gif)
 
 ---
 
@@ -317,7 +315,7 @@ animation::ani.options(interval = 0.05)
 gganimate(tween_chart, "tween_chart.gif", title_frame = FALSE,
           ani.width=800, ani.height=300)
 ```
-![](tween_chart.gif)
+![](./tween_chart.gif)
 
 
 ---
@@ -327,7 +325,7 @@ class: middle, center
 # And Thomas is not done yet...
 
 <section>
-    <img width="300" src="transformr.gif">
+    <img width="300" src="./transformr.gif">
 </section>
 
 He is currently working on a [`transformr` package](https://github.com/thomasp85/transformr)<br /> for smooth polygon transformations!
@@ -340,7 +338,7 @@ class: middle, center
 
 As well as on a complete grammar of animation for ggplot2!
 
-<img src="thomas.gif" width="22%">
+<img src="./thomas.gif" width="22%">
 
 <blockquote class="twitter-tweet" data-lang="en"><p lang="en" dir="ltr">More grammar arrives:<br><br>ggplot(mtcars, aes(factor(cyl), mpg)) + <br> geom_boxplot() + <br> geom_point() +<br> transition_states(am, transition_length = 4, state_length = 1) + <br> view_follow() </p>&mdash; Thomas Lin Pedersen (@thomasp85) <a href="https://twitter.com/thomasp85/status/988863035388366851?ref_src=twsrc%5Etfw">April 24, 2018</a></blockquote>  
 
@@ -358,7 +356,7 @@ For extensions and themes, the best place to start is  [ggplot2-exts.org](http:/
 
 In addition to `gganimate`, there are 40 packages to discover.
 
-![](ggplot-extension.png)
+![](./ggplot-extension.png)
 
 ---
 
@@ -528,4 +526,4 @@ class: middle, centered
 # Thank you!
 #### Xavier Adam (twitter: [@xvrdm](http://twitter.com/xvrdm/))
 
-<img src="epfl-exts-logo.png" width="30%">  
+<img src="./epfl-exts-logo.png" width="30%">  
