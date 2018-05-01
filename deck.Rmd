@@ -9,7 +9,7 @@ output:
     css: [default, default-fonts, "theme.css"]
     seal: false
     chakra: libs/remark-latest.min.js
-    self_contained: true
+    self_contained: false
     nature:
       highlightStyle: github
       highlightLines: true
@@ -36,6 +36,10 @@ class: middle, centered
 class: middle
 # Menu du jour
 
+A look at what you can do **around** a basic ggplot2 chart. 
+
+--
+
 ### 1. ggplot2 **post-processing**
 --
 
@@ -47,7 +51,7 @@ class: middle
 ---
 class: inverse, center, middle
 
-# Post-processing charts in R
+# 1. Post-processing charts without leaving R
 
 ---
 
@@ -95,6 +99,57 @@ data %>%
 
 ---
 
+
+Basic line chart skeleton with `ggplot2`.
+
+`ggplot()` creates your underlying layer and maps columns to axes.
+
+```{r fig.width=8, fig.height=4, dev='svg'}
+data %>%
+  ggplot(aes(x=Week, y=`# of questions`)) #<<
+```
+
+---
+
+Basic line chart skeleton with `ggplot2`.
+
+`ggplot::geom_...()` creates the charts elements. Here `geom_line` creates lines (one color per Assignee).
+
+```{r fig.width=8, fig.height=4, dev='svg'}
+data %>%
+  ggplot(aes(x=Week, y=`# of questions`)) +
+  geom_line(stat="identity", aes(color=Assignee), alpha = 0.7, size=1.5) #<<
+```
+
+---
+
+Basic line chart skeleton with `ggplot2`.
+
+Lastly we play with some cosmetic settings (`ggplot::theme_...()`) and add a title (`ggplot::labs()`).
+
+```{r fig.width=8, fig.height=4, dev='svg'}
+(data %>%
+  ggplot(aes(x=Week, y=`# of questions`)) +
+  geom_line(stat="identity", aes(color=Assignee), alpha = 0.7, size=1.5) + 
+  labs(title="Number of questions per week") + #<<
+  theme_minimal() -> sc) #<<
+```
+
+---
+
+How can we go from this...
+
+```{r echo=FALSE, fig.height=2, fig.width=8, dev='svg'}
+sc
+```
+
+...to this:
+
+<img src="fc.png" width="80%">
+
+
+---
+
 Adding support for Google Fonts, thanks to [Yixuan Qiu](https://statr.me)'s [`showtext`](https://github.com/yixuan/showtext) package.
 
 ```{r fig.height=3.5, fig.width=8, message=FALSE, warning=FALSE, dev='svg'}
@@ -126,14 +181,14 @@ data %>%
   ggplot(aes(x=Week, y=`# of questions`)) +
   geom_line(stat="identity", aes(color=Assignee), alpha = 0.7, size=2) +
   theme_minimal() +
-  theme(text = element_text(family = "Rubik")) -> lchart 
+  theme(text = element_text(family = "Rubik")) -> lchart #<<
 ```
 
 --
 
 ```{r}
 # Then we save it, as a png.
-ggsave(lchart, filename="chart.png", width = 8, height = 3) 
+ggsave(lchart, filename="chart.png", width = 8, height = 3) #<<
 ```
 
 Now we have `chart.png` in our computer, ready to be modified.
@@ -148,8 +203,8 @@ library(magick)
 chart <- image_read("chart.png")
 # Save the height in pixel of the image
 height <- image_data(chart) %>% attributes() %>% .$dim %>% .[[3]]
-# Adding top and bottom grey borders
-chart %>% image_border("lightgrey", "0x6") 
+# Adding top and bottom red borders
+chart %>% image_border("red", "0x6") 
 ```
 
 ---
@@ -159,10 +214,11 @@ Make a more complex margin: 50px + 6px + 170px. Then crop the bottom margin. I h
 ```{r message=FALSE, warning=FALSE}
 (chart_w_margins <- chart %>% 
   image_border("white", "0x50") %>% 
-  image_border("lightgrey", "0x6") %>%
+  image_border("red", "0x6") %>%
   image_border("white", "0x170") %>%
   # Crop the bottom margins
-  image_chop(stringr::str_glue("0x{170}+0+{height+170+6*2+50*2}"))) 
+  image_chop(stringr::str_glue("0x{170}+0+{height+170+6*2+50*2}")) %>%
+  image_border("grey", "2x2")) 
 ```
 
 
@@ -190,23 +246,23 @@ logo <- image_read_svg("epfl-exts-logo.svg", height = 110)
 
 ---
 
-Wrapping the entire thing in a function:
+Wrapping the entire thing in two functions.
+
+A reusable template function:
 
 ```{r message=FALSE, warning=FALSE}
-epfl_exts_line_chart <- function(data, x, y, color, title) {
-  data %>% {
-    ggplot(., aes_string(x=x, y=y)) +
-    geom_line(stat="identity", aes_string(color=color), alpha = 0.7, size=1.5) +
-    theme_minimal() + theme(text = element_text(family = "Rubik"))} %>%
+epfl_exts_template <- function(chart, title) {
+  chart %>%
     ggsave(filename="chart.png", width = 8, height = 3)
   
   chart <- image_read("chart.png")
   height <- image_data(chart) %>% attributes() %>% .$dim %>% .[[3]]
   chart %>% 
     image_border("white", "0x50") %>% 
-    image_border("lightgrey", "0x6") %>%
+    image_border("red", "0x6") %>%
     image_border("white", "0x170") %>%
-    image_chop(stringr::str_glue("0x{170}+0+{height+170+6*2+50*2}")) %>% 
+    image_chop(stringr::str_glue("0x{170}+0+{height+170+6*2+50*2}")) %>%
+    image_border("grey", "2x2") %>%
     image_annotate(title, font="Rubik", size = 70, color = "darkgrey",
                    gravity="northwest", location = "+50+40") %>%
     image_composite(image_read_svg("epfl-exts-logo.svg", height = 110),
@@ -214,13 +270,26 @@ epfl_exts_line_chart <- function(data, x, y, color, title) {
 }
 ```
 
+A chart generator example using the template function:
+
+```{r message=FALSE, warning=FALSE}
+epfl_exts_line_chart <- function(data, x, y, color, title) {
+  data %>% {
+    ggplot(., aes_string(x=x, y=y)) +
+    geom_line(stat="identity", aes_string(color=color), alpha = 0.7, size=1.5) +
+    theme_minimal() + theme(text = element_text(family = "Rubik"))} %>%
+    epfl_exts_template(title)  #<<
+}
+```
+
 ---
 Testing the final function.
  
 ```{r message=FALSE, warning=FALSE}
-epfl_exts_line_chart(data, "Week", "`# of questions`", "Assignee",
-                     "Let's try another title!")
-
+epfl_exts_line_chart(data=data, 
+                     x="Week", y="`# of questions`", 
+                     color="Assignee", 
+                     title="Let's try another title!")
 ```
 
 ---
@@ -253,10 +322,11 @@ data %>%
   ggplot(aes(x=Week, y=`# of questions`, frame=Week)) + #<<
   geom_line(stat="identity", 
             aes(color=Assignee, cumulative=TRUE), #<<
-            alpha = 0.7, size=1.5) +
-  theme_minimal() -> chart
+            alpha = 0.7, size=2) +
+  theme_minimal() + theme(text = element_text(size=30)) -> chart
 
-gganimate(chart, "chart.gif", ani.width=800, ani.height=350) #<<
+animation::ani.options(interval = 0.5) 
+gganimate(chart, "chart.gif", ani.width=1600, ani.height=600) #<<
 ```
 
 ![](./chart.gif)
@@ -309,12 +379,12 @@ data %>% mutate(Week = lubridate::week(Week)) %>%
 
 tweenr_data %>%
   ggplot(aes(Week, `# of questions`, frame = .frame)) + 
-  geom_path(aes(color=Assignee), alpha = 0.7, size=1.5) + #<<
-  theme_minimal() -> tween_chart
+  geom_path(aes(color=Assignee), alpha = 0.7, size=2) + 
+  theme_minimal() + theme(text = element_text(size=30))-> tween_chart
 
 animation::ani.options(interval = 0.05) 
-gganimate(tween_chart, "tween_chart.gif", title_frame = FALSE,
-          ani.width=800, ani.height=300)
+gganimate(tween_chart, "tween_chart.gif", title_frame = FALSE, #<<
+          ani.width=1600, ani.height=600) #<<
 ```
 ![](./tween_chart.gif)
 
@@ -347,7 +417,7 @@ As well as on a complete grammar of animation for ggplot2!
 
 class: inverse, center, middle
 
-# Using extensions
+# 2. Using extensions
 
 ---
 
@@ -363,10 +433,10 @@ In addition to `gganimate`, there are 40 packages to discover.
 
 # `ggrepel` for smart label placement
 
-[]()'s [`ggrepel` package](https://github.com/slowkow/ggrepel) was one of the first extension to gain fame. It places your label for you so they don't overlap.
+[Kamil Slowikowski](https://slowkow.com)'s [`ggrepel` package](https://github.com/slowkow/ggrepel) was one of the first extension to gain fame. It places your label for you so they don't overlap.
 
-```{r fig.height=3.5, fig.width=10}
-ggplot(mtcars, aes(mpg, wt)) +
+```{r fig.height=3.5, fig.width=10, dev='svg'}
+ggplot(data=mtcars, aes(x=mpg, y=wt)) +
   geom_point() +
   geom_text(label=rownames(mtcars)) +
   theme_minimal() + 
@@ -379,10 +449,10 @@ ggplot(mtcars, aes(mpg, wt)) +
 
 [Kamil Slowikowski](https://twitter.com/slowkow)'s [`ggrepel` package](https://github.com/slowkow/ggrepel) was one of the first extension to gain fame. It places your label for you so they don't overlap (lots of examples [on the vignette](https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html)).
 
-```{r fig.height=3.5, fig.width=10}
-ggplot(mtcars, aes(mpg, wt)) +
+```{r fig.height=3.5, fig.width=10, dev='svg'}
+ggplot(data=mtcars, aes(x=mpg, y=wt)) +
   geom_point() +
-  ggrepel::geom_text_repel(label=rownames(mtcars)) +
+  ggrepel::geom_text_repel(label=rownames(mtcars)) + #<<
   theme_minimal() + 
   labs(title="Labels with ggrepel...")
 ```
@@ -393,12 +463,12 @@ ggplot(mtcars, aes(mpg, wt)) +
 
 Since `ggrepel::geom_text_repel` is just another `geom` you can select subsets the same way as usual.
 
-```{r fig.height=3.5, fig.width=10}
-subdata <- subset(mtcars, mpg>25 | wt>4)
-ggplot(mtcars, aes(mpg, wt)) +
+```{r fig.height=3.5, fig.width=10, dev='svg'}
+subdata <- subset(mtcars, mpg>25 | wt>4) #<<
+ggplot(data=mtcars, aes(x=mpg, y=wt)) +
   geom_point() +
-  ggrepel::geom_text_repel(label=rownames(subdata), data=subdata,
-                           force=3, min.segment.length=0) +
+  ggrepel::geom_text_repel(label=rownames(subdata), data=subdata, #<<
+                           force=3, min.segment.length=0) + #<<
   theme_minimal() + 
   labs(title="Labels with ggrepel...")
 ```
@@ -427,7 +497,7 @@ gglabeller(p, aes(label = rownames(mtcars)))
 
 class: inverse, center, middle
 
-# Spelunking ggplot internals
+# 3. Spelunking ggplot internals
 
 ---
 
@@ -474,13 +544,19 @@ str(ggplot_build(gg)) # Not for the faint-hearted...
 
 ---
 
-```{r fig.height=3, fig.width=10, message=FALSE, warning=FALSE}
-(mpg %>% group_by(manufacturer) %>% summarize_at("cyl", "mean") %>%
+```{r fig.height=3, fig.width=10, message=FALSE, warning=FALSE, dev='svg'}
+mpg %>% group_by(manufacturer) %>% summarize_at("cyl", "mean") %>%
 ggplot(aes(forcats::fct_reorder(manufacturer,cyl,.desc=TRUE), cyl)) + 
-  geom_point() + labs(x="manufacturer") -> gg)
+  geom_point() + labs(x="manufacturer") -> gg
+
+gg + geom_text(aes(label=round(cyl,1)))#
 ```
 
-Once you know where to look (which is the hardest part), there are gems to be found. Below, we can get the final x and y axis ranges after they have been dynamically generated by `ggplot2`.
+We could add a fixed `nudge_y` value to prevent point/label overlapping. 
+
+But is there a more flexible way? 
+
+Once you know where to look (which is the hardest part), there are gems to be found in ggplot internals. Below, we can get the final x and y axis ranges after they have been dynamically generated by `ggplot2`.
 
 ```{r}
 ggplot_build(gg) -> gb
@@ -491,16 +567,14 @@ ggplot_build(gg) -> gb
 
 Now use this information for your next geom. Rather than using fixed nudges...
 
-```{r fig.height=2, fig.width=10}
-gg + 
-  geom_text(aes(label=round(cyl,1)), nudge_y=0.5)
+```{r fig.height=2, fig.width=10, dev='svg'}
+gg + geom_text(aes(label=round(cyl,1)), nudge_y=0.5) #<<
 ```
 
 ... try this! Your optimal nudge distance is **automatically calculated**!
 
-```{r fig.height=2, fig.width=10}
-gg + 
-  geom_text(aes(label=round(cyl,1)), nudge_y=(yrange[2]-yrange[1])/10)
+```{r fig.height=2, fig.width=10, dev='svg'}
+gg + geom_text(aes(label=round(cyl,1)), nudge_y=(yrange[2]-yrange[1])/10) #<<
 ```
 
 This solution scales to as many geoms as you need.
